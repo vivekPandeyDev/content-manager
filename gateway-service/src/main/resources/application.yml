@@ -1,0 +1,26 @@
+jwt:
+    auth:
+        converter:
+            resource-id: ${JWT_RESOURCE_ID}
+            principle-attribute: preferred_username
+
+server:
+    port: 8080
+
+spring:
+    security:
+        oauth2:
+            resourceserver:
+                jwt:
+                    issuer-uri: ${JWT_ISSUER_URI}
+                    jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+    application:
+        name: gateway-service
+    cloud:
+        gateway:
+            routes:
+                - id: USER-SERVICE
+                  uri: lb://USER-SERVICE
+                  predicates:
+                      - Path=/api/users/**
+

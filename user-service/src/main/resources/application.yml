@@ -1,0 +1,30 @@
+auth:
+  keycloak:
+    config:
+      client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
+      default-role: user
+      realm: auth-server
+      domain: ${KEYCLOAK_DOMAIN}
+      admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
+      admin-client-secret: ${KEYCLOAK_CLIENT_SECRET}
+server:
+  port: 8081
+
+spring:
+
+  #  kafka consumer
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: oauth-user-group-1
+  #       form data enable
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+#      application name
+  application:
+    name: user-service
+  #    update config at last
+  config:
+    import: configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:8083}
