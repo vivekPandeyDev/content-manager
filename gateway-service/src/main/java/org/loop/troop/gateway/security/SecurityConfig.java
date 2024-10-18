@@ -19,7 +19,9 @@ public class SecurityConfig {
     private static final String[] PUBLIC_URLS = {
             "/api/users/register",
             "/api/auth/token",
-            "/actuator/*"
+            "/actuator/**",
+            "/home",
+            "/eureka/**"
     };
 
     @Bean

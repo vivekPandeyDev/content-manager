@@ -39,16 +39,6 @@ public class User implements Serializable {
     @Column(name = "role")
     private List<String> roles = new ArrayList<>();
 
-    @ElementCollection
-    @CollectionTable(name = "user_followers", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "follower")
-    private Set<UUID> followers = new HashSet<>();
-
-    @ElementCollection
-    @CollectionTable(name = "user_followings", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "following")
-    private Set<UUID> followings = new HashSet<>();
-
     // optional user details
     private String profileUrl;
 

@@ -38,7 +38,7 @@ public class TokenController {
                 .flatMap(z ->
                         Mono.just(
                                 ResponseEntity.ok(
-                                        Map.of("unique_name", z.getName()
+                                        Map.of("user_name", z.getName()
                                         )
                                 )
                         )

@@ -1,5 +1,6 @@
 package org.loop.troop.user.file;
 
+import jakarta.validation.constraints.NotNull;
 import org.loop.troop.user.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class ImageService implements FileService {
         Path path = getFolderPath(uploadDir);
         String imageName = getFilenameWithExtension(fileName, file);
         Files.copy(file.getInputStream(), path.resolve(imageName), StandardCopyOption.REPLACE_EXISTING);
-        return imageName;
+        return getFilenameWithExtension(imageName);
     }
 
     @Override
@@ -46,6 +47,17 @@ public class ImageService implements FileService {
         return Files.readAllBytes(path.resolve(fileName));
     }
 
+    private String getFilenameWithExtension(String fileName){
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("Filename cannot be null or empty");
+        }
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex == -1) {
+            return fileName;
+        } else {
+            return fileName.substring(0, dotIndex);
+        }
+    }
 
     private String getFilenameWithExtension(String newName, MultipartFile file) {
         String originalFilename = file.getOriginalFilename();

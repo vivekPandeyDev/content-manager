@@ -3,7 +3,7 @@ auth:
     config:
       client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
       default-role: user
-      realm: auth-server
+      realm: ${KEYCLOAK_REALM}
       domain: ${KEYCLOAK_DOMAIN}
       admin-client-id: ${KEYCLOAK_ADMIN_CLIENT_ID}
       admin-client-secret: ${KEYCLOAK_CLIENT_SECRET}

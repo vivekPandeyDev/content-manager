@@ -1,6 +1,7 @@
 package org.loop.troop.user.app;
 
-import org.loop.troop.user.dto.Operation;
+
+import jakarta.transaction.Transactional;
 import org.loop.troop.user.dto.RegisterDto;
 import org.loop.troop.user.dto.UserDto;
 import org.loop.troop.user.exception.ServiceException;
@@ -11,13 +12,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -64,66 +65,6 @@ public class UserServiceImpl implements UserService {
         final var savedUser = userRepository.findByUserId(uuid).orElseThrow(
                 () -> new ServiceException("No User Found with user with userId: %s".formatted(uuid), HttpStatus.NOT_FOUND, "No User Found")
         );
-        if (log.isDebugEnabled()) log.debug(USER_DETAIL, savedUser);
-        return mapper.map(savedUser, UserDto.class);
-    }
-
-
-    @Override
-    public UserDto updateFollower(UUID currentUserUUIID,UUID followerUUID, Operation operation) {
-        if(currentUserUUIID.equals(followerUUID)){
-            throw  new ServiceException("Cannot add yourself to the followers list");
-        }
-        final var savedUser = userRepository.findByUserId(currentUserUUIID).orElseThrow(
-                () -> new ServiceException("No User Found with user with userId: %s".formatted(currentUserUUIID), HttpStatus.NOT_FOUND, "No User Found")
-        );
-        if(!userRepository.existsById(currentUserUUIID)){
-            throw new ServiceException("No Follower Found with user with userId: %s".formatted(followerUUID), HttpStatus.NOT_FOUND, "No User Found");
-        }
-
-        final var existingFollowers = savedUser.getFollowers();
-
-
-        // Update followers based on the operation
-        if (operation == Operation.ADD) {
-            existingFollowers.add(followerUUID);
-        } else if (operation == Operation.REMOVE) {
-            existingFollowers.remove(followerUUID);
-        }
-
-        savedUser.setFollowers(existingFollowers);
-        userRepository.save(savedUser);
-
-        if (log.isDebugEnabled()) log.debug(USER_DETAIL, savedUser);
-        return mapper.map(savedUser, UserDto.class);
-    }
-
-    @Override
-    @Transactional
-    public UserDto updateFollowing(UUID currentUserUUIID,UUID followingUUID,Operation operation) {
-        if(currentUserUUIID.equals(followingUUID)){
-            throw  new ServiceException("Cannot add yourself to the followings list");
-        }
-        final var savedUser = userRepository.findByUserId(currentUserUUIID).orElseThrow(
-                () -> new ServiceException("No User Found with user with userId: %s".formatted(currentUserUUIID), HttpStatus.NOT_FOUND, "No User Found")
-        );
-
-        if(!userRepository.existsById(currentUserUUIID)){
-            throw new ServiceException("No Following Found with user with userId: %s".formatted(followingUUID), HttpStatus.NOT_FOUND, "No User Found");
-        }
-
-        final var existingFollowings = savedUser.getFollowings();
-
-        // Update followers based on the operation
-        if (operation == Operation.ADD) {
-            existingFollowings.add(followingUUID);
-        } else if (operation == Operation.REMOVE) {
-            existingFollowings.remove(followingUUID);
-        }
-
-        savedUser.setFollowings(existingFollowings);
-        userRepository.save(savedUser);
-
         if (log.isDebugEnabled()) log.debug(USER_DETAIL, savedUser);
         return mapper.map(savedUser, UserDto.class);
     }

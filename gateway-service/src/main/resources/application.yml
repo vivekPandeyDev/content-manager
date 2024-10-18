@@ -16,6 +16,9 @@ spring:
                     jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
     application:
         name: gateway-service
+    #    update config at last
+    config:
+      import: configserver:${SPRING_CLOUD_CONFIG_URI:http://localhost:8083}
     cloud:
         gateway:
             routes:
@@ -23,4 +26,14 @@ spring:
                   uri: lb://USER-SERVICE
                   predicates:
                       - Path=/api/users/**
+                - id: GATEWAY-SERVICE
+                  uri: ${EUREKA_BASE_URL}
+                  predicates:
+                      - Path=/home
+                  filters:
+                      - SetPath=/
+                - id: GATEWAY-SERVICE-STATIC
+                  uri: ${EUREKA_BASE_URL}
+                  predicates:
+                    - Path=/**
 

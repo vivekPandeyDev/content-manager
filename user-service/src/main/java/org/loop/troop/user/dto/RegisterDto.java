@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.keycloak.representations.idm.UserRepresentation;
 
+import java.util.*;
 import java.util.stream.Stream;
 
 @Data
@@ -34,9 +35,6 @@ public class RegisterDto {
 
 
     private String profileUrl;
-
-    private String bio;
-
 
     public UserRepresentation toUserRepresentation() {
         UserRepresentation userRepresentation = new UserRepresentation();

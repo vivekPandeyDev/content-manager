@@ -48,7 +48,7 @@ public class KeyCloakServiceImpl implements KeyCloakService {
                 }
 
 
-                return UUID.fromString(users.get(0).getId());
+                return UUID.fromString(users.getFirst().getId());
             }
 
         }
@@ -61,7 +61,7 @@ public class KeyCloakServiceImpl implements KeyCloakService {
         if (users.isEmpty()) {
             throw new ServiceException("user cannot be find by given username: " + username);
         }
-        return users.get(0);
+        return users.getFirst();
     }
 
     public RoleRepresentation getKeycloakRoles(String roleName) {
@@ -91,7 +91,7 @@ public class KeyCloakServiceImpl implements KeyCloakService {
         if (clients.isEmpty()) {
             throw new ServiceException("No client found with clientId: " + clientId);
         }
-        return clients.get(0).getId();
+        return clients.getFirst().getId();
     }
 
 
