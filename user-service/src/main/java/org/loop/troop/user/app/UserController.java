@@ -1,14 +1,15 @@
 package org.loop.troop.user.app;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.loop.troop.user.dto.RegisterDto;
 import org.loop.troop.user.dto.UserDto;
 import org.loop.troop.user.exception.ServiceException;
 import org.loop.troop.user.file.FileService;
 import org.loop.troop.user.file.ImageService;
 import org.loop.troop.user.response.ApiResponse;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @SuppressWarnings("unused")
+@SecurityRequirement( name = "keycloak")
 public class UserController {
 
     private final UserService userService;

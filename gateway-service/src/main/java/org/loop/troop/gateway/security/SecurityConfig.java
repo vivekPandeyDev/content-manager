@@ -3,7 +3,6 @@ package org.loop.troop.gateway.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -22,7 +21,10 @@ public class SecurityConfig {
             "/api/v1/public/**",
             "/actuator/**",
             "/home",
-            "/eureka/**"
+            "/eureka/**",
+            "/swagger-ui/**",
+            "/swagger-doc/**",
+            "/swagger-ui.html"
     };
 
     @Bean
@@ -32,7 +34,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges ->
                         exchanges
                                 .pathMatchers(PUBLIC_URLS).permitAll()
-                                .anyExchange().authenticated()
+                                .anyExchange().permitAll()
                 )
                 .exceptionHandling(handlingSpec ->
                         handlingSpec

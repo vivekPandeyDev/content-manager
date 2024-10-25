@@ -1,3 +1,6 @@
+jwt:
+  open-id-security-name: keycloak
+  open-id-uri: http://${OPEN_ID_HOST}:9090/realms/auth-server/.well-known/openid-configuration
 auth:
   keycloak:
     config:
@@ -9,6 +12,12 @@ auth:
       admin-client-secret: ${KEYCLOAK_CLIENT_SECRET}
 server:
   port: 8081
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
 
 spring:
 
