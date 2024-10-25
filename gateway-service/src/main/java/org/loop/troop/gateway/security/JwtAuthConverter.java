@@ -9,22 +9,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class JwtAuthConverter implements Converter<Jwt, Mono<AbstractAuthenticationToken>> {
-
-    private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter =
-            new JwtGrantedAuthoritiesConverter();
 
     @Value("${jwt.auth.converter.principle-attribute}")
     private String principleAttribute;
@@ -32,13 +24,12 @@ public class JwtAuthConverter implements Converter<Jwt, Mono<AbstractAuthenticat
     @Value("${jwt.auth.converter.resource-id}")
     private String resourceId;
 
+
+    private final List<String> filterRole = List.of("default-roles-auth-server","offline_access","uma_authorization");
+
     @Override
     public Mono<AbstractAuthenticationToken> convert(@NonNull Jwt jwt) {
-        var token = jwtGrantedAuthoritiesConverter.convert(jwt);
-        Collection<GrantedAuthority> authorities = Stream.concat(
-                token.stream(),
-                extractResourceRoles(jwt, resourceId).stream()
-        ).collect(Collectors.toSet());
+        Collection<GrantedAuthority> authorities = extractResourceRoles(jwt, resourceId);
 
         return Mono.just(new JwtAuthenticationToken(
                 jwt,
@@ -56,24 +47,21 @@ public class JwtAuthConverter implements Converter<Jwt, Mono<AbstractAuthenticat
     }
 
     private Collection<GrantedAuthority> extractResourceRoles(Jwt jwt, String resourceId) {
-        Map<String, Map<String, Collection<String>>> resourceAccess = jwt.getClaim("resource_access");
-        if (resourceAccess == null) {
+        Map<String,Collection<String>> realmAccess = jwt.getClaim("realm_access");
+        if (realmAccess == null) {
             return Collections.emptySet();
         }
+        Collection<String> resourceRoles = realmAccess.get("roles");
 
-        Map<String, Collection<String>> resource = resourceAccess.get(resourceId);
-        if (resource == null) {
-            return Collections.emptySet();
-        }
-
-        Collection<String> resourceRoles = resource.get("roles");
         if (resourceRoles == null) {
             return Collections.emptySet();
         }
 
         return resourceRoles
                 .stream()
+                .filter(role -> !filterRole.contains(role.toLowerCase()))
                 .map(role -> new SimpleGrantedAuthority("ROLE_"+role.toUpperCase(Locale.ENGLISH)))
                 .collect(Collectors.toSet());
     }
+
 }
