@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: content-manager
     volumes:
-      - keycloak_and_postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres:/var/lib/postgresql/data
     networks:
       - app_global
 
@@ -29,9 +29,10 @@ services:
       KC_DB_URL:  jdbc:postgresql://postgresql:5432/content-manager
       KC_DB_USERNAME: postgres
       KC_DB_PASSWORD: password
+      KC_IMPORT: /opt/keycloak/data/import/realm-export.json
     volumes:
-      - keycloak_and_postgres_data:/opt/jboss/keycloak/standalone/data
-    command: start-dev
+      - ./docker/keycloak:/opt/keycloak/data/import
+    command: start-dev  --import-realm --verbose
     depends_on:
       - postgresql
     networks:
@@ -45,7 +46,7 @@ services:
     networks:
       - app_global
     volumes:
-      - redis_data:/data
+      - ./docker/redis:/data
 
   kafka:
     image: wurstmeister/kafka:latest
@@ -64,7 +65,7 @@ services:
     networks:
       - app_global
     volumes:
-      - zookeeper_and_kafka_data:/var/lib/kafka/data
+      - ./docker/event/kafka:/var/lib/kafka/data
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
@@ -74,7 +75,7 @@ services:
     networks:
       - app_global
     volumes:
-      - zookeeper_and_kafka_data:/var/lib/zookeeper/data
+      - ./docker/event/zookeeper:/var/lib/zookeeper/data
 
   zipkin:
     image: openzipkin/zipkin
@@ -88,8 +89,3 @@ services:
 networks:
   app_global:
     driver: bridge
-
-volumes:
-  keycloak_and_postgres_data:
-  redis_data:
-  zookeeper_and_kafka_data:
