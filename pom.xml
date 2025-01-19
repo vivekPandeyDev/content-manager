@@ -19,6 +19,7 @@
 		<module>gateway-service</module>
 		<module>config-service</module>
 		<module>user-service</module>
+		<module>notification-1.0.0</module>
 	</modules>
 	<url/>
 	<licenses>
