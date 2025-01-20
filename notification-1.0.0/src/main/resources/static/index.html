@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notification Service</title>
+</head>
+<body>
+    
+<h2>Notification Service</h2>
+
+<!-- Form for user to log in -->
+<div id="loginSection">
+    <h3>Login</h3>
+    <form id="loginForm">
+        <label>Enter your username: <input type="text" id="username" required></label>
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+<!-- Notification Section -->
+<div id="notificationSection" style="display:none;">
+    <h3>Notifications</h3>
+    <ul id="notifications"></ul>
+</div>
+
+<!-- Form to simulate "like" -->
+<div>
+    <h3>Simulate Like Event</h3>
+    <form id="likeForm">
+        <label>Photo ID: <input type="text" id="photoId" required></label><br>
+        <label>Liked By: <input type="text" id="likedBy" required></label><br>
+        <label>Photo Owner (Receiver): <input type="text" id="ownerUser" required></label><br>
+        <label>Photo Type: <input type="text" id="photoTitle" required></label>
+        <button type="submit">Send Like Notification</button>
+    </form>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web-socket-js/1.0.0/web_socket.js" integrity="sha512-P61hA8M2fuA0NxiHXTb+Ul1znVk0ybLXejE3xWtXJsl6SVG09qnFrw3XgZTBpoysP88jUw9UEVzDwYaRjPkwCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+        // let ws;
+
+        // Handle user login
+        document.getElementById("loginForm").onsubmit = function(e) {
+            e.preventDefault();
+            const username = document.getElementById("username").value;
+            if (!username) return alert("Please enter a username!");
+
+            // Establish WebSocket connection for the logged-in user
+           const ws = new WebSocket("ws://localhost:8080/ws?username=" + username);
+
+            ws.onopen = () => {
+                debugger;
+                console.log("WebSocket connected");
+            };
+
+            ws.onmessage = (event) => {
+                debugger;
+                console.log("Received:", event.data);
+            };
+
+            ws.onerror = (error) => {
+                debugger;
+                console.error("WebSocket error:", error);
+            };
+
+            ws.onclose = () => {
+                debugger;
+                console.log("WebSocket closed");
+            };
+
+
+            ws.onmessage = function(event) {
+                const notifications = document.getElementById("notifications");
+                const li = document.createElement("li");
+                li.textContent = event.data;
+                notifications.appendChild(li);
+            };
+
+            ws.onopen = function() {
+                debugger;
+                alert("Connected as " + username);
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("notificationSection").style.display = "block";
+            };
+
+            ws.onerror = function(e) {
+                debugger;
+
+                alert("WebSocket connection error. Please try again.");
+            };
+        };
+
+        // Simulate sending a "like" event
+        document.getElementById("likeForm").onsubmit = async function(e) {
+            e.preventDefault();
+            const photoId = document.getElementById("photoId").value;
+            const likedBy = document.getElementById("likedBy").value;
+            const ownerUser = document.getElementById("ownerUser").value;
+            const photoTitle= document.getElementById("photoTitle").value;
+
+            const now = new Date();
+
+            // Get individual components
+            // const year = now.getFullYear();
+            // const month = now.getMonth() + 1; // Months are 0-indexed
+            // const day = now.getDate();
+            // const hours = now.getHours();
+            // const minutes = now.getMinutes();
+            // const seconds = now.getSeconds();
+
+            // Format the date and time
+            // const formattedDateTime = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // console.log(formattedDateTime);
+
+            if (!photoId || !likedBy || !ownerUser) return alert("All fields are required!");
+
+            const event = {
+                event: "photo_liked",
+                photoId,
+                likedByUsername: likedBy,
+                ownerUserName: ownerUser,
+                photoTitle:photoTitle
+            };
+
+            await fetch("http://localhost:8080/api/notifications", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(event)
+            });
+            console.log(JSON.stringify(event));
+
+            alert("Like event sent successfully!");
+        };
+    </script>
+</body>
+</html>
+
