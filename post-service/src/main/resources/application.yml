@@ -1,0 +1,29 @@
+server:
+  port: 8088
+
+minio:
+  access-key: u282J1pPgQGMdKjiJHsa
+  secret-key: 8GfL7K5qQaFvYRGaGELI2yntNJr7QaRlhv5PoB1G
+  endpoint: http://localhost:9000
+  bucket-name: social
+
+spring:
+  application:
+    name: post-service
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+  h2:
+    console:
+      enabled: true
+  datasource:
+    driver-class-name: org.h2.Driver
+    password: root
+    url: jdbc:h2:file:./social/post
+    username: sa
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
